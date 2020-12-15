@@ -27,14 +27,14 @@ class AreaTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $modules = ['node', 'views_ui'];
+  protected static $modules = ['node', 'views_ui'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
-  protected function setUp($import_test_views = TRUE) {
+  protected function setUp($import_test_views = TRUE): void {
     parent::setUp($import_test_views);
 
     $this->enableViewsTestModule();
@@ -54,10 +54,13 @@ class AreaTest extends ViewTestBase {
   }
 
   /**
-   * Tests the generic UI of a area handler.
+   * Tests the generic UI of an area handler.
    */
   public function testUI() {
-    $admin_user = $this->drupalCreateUser(['administer views', 'administer site configuration']);
+    $admin_user = $this->drupalCreateUser([
+      'administer views',
+      'administer site configuration',
+    ]);
     $this->drupalLogin($admin_user);
 
     $types = ['header', 'footer', 'empty'];
@@ -66,20 +69,20 @@ class AreaTest extends ViewTestBase {
       $edit_path = 'admin/structure/views/nojs/handler/test_example_area/default/' . $type . '/test_example';
 
       // First setup an empty label.
-      $this->drupalPostForm($edit_path, [], t('Apply'));
+      $this->drupalPostForm($edit_path, [], 'Apply');
       $this->assertText('Test Example area');
 
       // Then setup a no empty label.
       $labels[$type] = $this->randomMachineName();
-      $this->drupalPostForm($edit_path, ['options[admin_label]' => $labels[$type]], t('Apply'));
+      $this->drupalPostForm($edit_path, ['options[admin_label]' => $labels[$type]], 'Apply');
       // Make sure that the new label appears on the site.
       $this->assertText($labels[$type]);
 
       // Test that the settings (empty/admin_label) are accessible.
       $this->drupalGet($edit_path);
-      $this->assertField('options[admin_label]');
+      $this->assertSession()->fieldExists('options[admin_label]');
       if ($type !== 'empty') {
-        $this->assertField('options[empty]');
+        $this->assertSession()->fieldExists('options[empty]');
       }
     }
   }
@@ -158,7 +161,10 @@ class AreaTest extends ViewTestBase {
    * Tests global tokens.
    */
   public function testRenderAreaToken() {
-    $admin_user = $this->drupalCreateUser(['administer views', 'administer site configuration']);
+    $admin_user = $this->drupalCreateUser([
+      'administer views',
+      'administer site configuration',
+    ]);
     $this->drupalLogin($admin_user);
 
     $view = Views::getView('test_example_area');

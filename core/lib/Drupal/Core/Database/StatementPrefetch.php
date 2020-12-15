@@ -216,11 +216,12 @@ class StatementPrefetch implements \Iterator, StatementInterface {
    *   The query.
    * @param array|null $args
    *   An array of arguments. This can be NULL.
+   *
    * @return \PDOStatement
    *   A PDOStatement object.
    */
   protected function getStatement($query, &$args = []) {
-    return $this->dbh->prepare($query);
+    return $this->dbh->prepare($query, $this->driverOptions);
   }
 
   /**

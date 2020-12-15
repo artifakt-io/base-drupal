@@ -45,14 +45,21 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
 
     // Create a user who can administer search, do searches, see the status
     // report, and administer cron. Log in.
-    $user = $this->drupalCreateUser(['administer search', 'search content', 'use advanced search', 'access content', 'access site reports', 'administer site configuration']);
+    $user = $this->drupalCreateUser([
+      'administer search',
+      'search content',
+      'use advanced search',
+      'access content',
+      'access site reports',
+      'administer site configuration',
+    ]);
     $this->drupalLogin($user);
 
     // Set up the search plugin.
@@ -147,7 +154,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
 
     // Now index the rest of the nodes.
     // Make sure index throttle is high enough, via the UI.
-    $this->drupalPostForm('admin/config/search/pages', ['cron_limit' => 20], t('Save configuration'));
+    $this->drupalPostForm('admin/config/search/pages', ['cron_limit' => 20], 'Save configuration');
     $this->assertEqual(20, $this->config('search.settings')->get('index.cron_limit', 100), 'Config setting was saved correctly');
     // Get a new search plugin, to make sure it has this setting.
     $this->plugin = $this->container->get('plugin.manager.search')->createInstance('node_search');
@@ -157,8 +164,8 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     $this->assertDatabaseCounts(8, 0, 'after updating fully');
 
     // Click the reindex button on the admin page, verify counts, and reindex.
-    $this->drupalPostForm('admin/config/search/pages', [], t('Re-index site'));
-    $this->drupalPostForm(NULL, [], t('Re-index site'));
+    $this->drupalPostForm('admin/config/search/pages', [], 'Re-index site');
+    $this->submitForm([], 'Re-index site');
     $this->assertIndexCounts(8, 8, 'after reindex');
     $this->assertDatabaseCounts(8, 0, 'after reindex');
     $this->plugin->updateIndex();

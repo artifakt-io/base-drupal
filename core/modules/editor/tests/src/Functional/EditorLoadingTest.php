@@ -20,7 +20,7 @@ class EditorLoadingTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['filter', 'editor', 'editor_test', 'node'];
+  protected static $modules = ['filter', 'editor', 'editor_test', 'node'];
 
   /**
    * {@inheritdoc}
@@ -48,7 +48,7 @@ class EditorLoadingTest extends BrowserTestBase {
    */
   protected $privilegedUser;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Let there be T-rex.
@@ -105,9 +105,23 @@ class EditorLoadingTest extends BrowserTestBase {
       ->save();
 
     // Create 3 users, each with access to different text formats.
-    $this->untrustedUser = $this->drupalCreateUser(['create article content', 'edit any article content']);
-    $this->normalUser = $this->drupalCreateUser(['create article content', 'edit any article content', 'use text format filtered_html']);
-    $this->privilegedUser = $this->drupalCreateUser(['create article content', 'edit any article content', 'create page content', 'edit any page content', 'use text format filtered_html', 'use text format full_html']);
+    $this->untrustedUser = $this->drupalCreateUser([
+      'create article content',
+      'edit any article content',
+    ]);
+    $this->normalUser = $this->drupalCreateUser([
+      'create article content',
+      'edit any article content',
+      'use text format filtered_html',
+    ]);
+    $this->privilegedUser = $this->drupalCreateUser([
+      'create article content',
+      'edit any article content',
+      'create page content',
+      'edit any page content',
+      'use text format filtered_html',
+      'use text format full_html',
+    ]);
   }
 
   /**
@@ -220,7 +234,8 @@ class EditorLoadingTest extends BrowserTestBase {
     $this->assertTrue($editor_settings_present, 'Text Editor module settings.');
     $this->assertTrue($editor_js_present, 'Text Editor JavaScript.');
     $this->assertCount(1, $body, 'A body field exists.');
-    $this->assertFieldByXPath('//textarea[@id="edit-body-0-value" and @disabled="disabled"]', t('This field has been disabled because you do not have sufficient permissions to edit it.'), 'Text format access denied message found.');
+    $this->assertSession()->fieldDisabled("edit-body-0-value");
+    $this->assertSession()->fieldValueEquals("edit-body-0-value", 'This field has been disabled because you do not have sufficient permissions to edit it.');
     $this->assertCount(0, $format_selector, 'No text format selector exists on the page.');
     $hidden_input = $this->xpath('//input[@type="hidden" and contains(@class, "editor")]');
     $this->assertCount(0, $hidden_input, 'A single text format hidden input does not exist on the page.');
@@ -244,7 +259,7 @@ class EditorLoadingTest extends BrowserTestBase {
     ]);
     $editor->save();
 
-    // Create an "page" node that uses the full_html text format.
+    // Create a "page" node that uses the full_html text format.
     $this->drupalCreateNode([
       'type' => 'page',
       'field_text' => [

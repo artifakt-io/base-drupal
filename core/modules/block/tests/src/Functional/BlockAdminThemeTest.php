@@ -16,7 +16,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['block', 'contextual'];
+  protected static $modules = ['block', 'contextual'];
 
   /**
    * {@inheritdoc}
@@ -28,7 +28,10 @@ class BlockAdminThemeTest extends BrowserTestBase {
    */
   public function testAdminTheme() {
     // Create administrative user.
-    $admin_user = $this->drupalCreateUser(['administer blocks', 'administer themes']);
+    $admin_user = $this->drupalCreateUser([
+      'administer blocks',
+      'administer themes',
+    ]);
     $this->drupalLogin($admin_user);
 
     // Ensure that access to block admin page is denied when theme is not
@@ -39,7 +42,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
     // Install admin theme and confirm that tab is accessible.
     \Drupal::service('theme_installer')->install(['bartik']);
     $edit['admin_theme'] = 'bartik';
-    $this->drupalPostForm('admin/appearance', $edit, t('Save configuration'));
+    $this->drupalPostForm('admin/appearance', $edit, 'Save configuration');
     $this->drupalGet('admin/structure/block/list/bartik');
     $this->assertSession()->statusCodeEquals(200);
   }
@@ -60,7 +63,7 @@ class BlockAdminThemeTest extends BrowserTestBase {
     // Install admin theme and confirm that tab is accessible.
     \Drupal::service('theme_installer')->install(['seven']);
     $edit['admin_theme'] = 'seven';
-    $this->drupalPostForm('admin/appearance', $edit, t('Save configuration'));
+    $this->drupalPostForm('admin/appearance', $edit, 'Save configuration');
 
     // Define our block settings.
     $settings = [

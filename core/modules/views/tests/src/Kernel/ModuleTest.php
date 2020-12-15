@@ -2,15 +2,19 @@
 
 namespace Drupal\Tests\views\Kernel;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Form\FormState;
+use Drupal\views\Plugin\views\area\Broken as BrokenArea;
+use Drupal\views\Plugin\views\field\Broken as BrokenField;
+use Drupal\views\Plugin\views\filter\Broken as BrokenFilter;
+use Drupal\views\Plugin\views\filter\Standard;
+use Drupal\views\Views;
+
 /**
  * Tests basic functions from the Views module.
  *
  * @group views
  */
-use Drupal\views\Plugin\views\filter\Standard;
-use Drupal\views\Views;
-use Drupal\Component\Render\FormattableMarkup;
-
 class ModuleTest extends ViewsKernelTestBase {
 
   /**
@@ -25,7 +29,7 @@ class ModuleTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['field', 'user', 'block'];
+  protected static $modules = ['field', 'user', 'block'];
 
   /**
    * Stores the last triggered error.
@@ -42,14 +46,41 @@ class ModuleTest extends ViewsKernelTestBase {
    * @see \Drupal\views\Plugin\ViewsHandlerManager::getHandler()
    */
   public function testViewsGetHandler() {
-    $types = ['field', 'area', 'filter'];
-    foreach ($types as $type) {
-      $item = [
-        'table' => $this->randomMachineName(),
-        'field' => $this->randomMachineName(),
-      ];
-      $handler = $this->container->get('plugin.manager.views.' . $type)->getHandler($item);
-      $this->assertEqual('Drupal\views\Plugin\views\\' . $type . '\Broken', get_class($handler), new FormattableMarkup('Make sure that a broken handler of type: @type is created.', ['@type' => $type]));
+    $types = [
+      'field' => BrokenField::class,
+      'area' => BrokenArea::class,
+      'filter' => BrokenFilter::class,
+    ];
+    // Test non-existent tables/fields.
+    $items = [
+      [
+        'table' => 'table_invalid',
+        'field' => 'id',
+      ],
+      [
+        'table' => 'views_test_data',
+        'field' => 'field_invalid',
+      ],
+    ];
+    $form_state = new FormState();
+    $description_top = '<p>' . t('The handler for this item is broken or missing. The following details are available:') . '</p>';
+    $description_bottom = '<p>' . t('Enabling the appropriate module may solve this issue. Otherwise, check to see if there is a module update available.') . '</p>';
+    foreach ($types as $type => $class) {
+      foreach ($items as $item) {
+        $handler = $this->container->get('plugin.manager.views.' . $type)
+          ->getHandler($item);
+        $this->assertTrue($handler instanceof $class);
+        // Make sure details available at edit form.
+        $form = [];
+        $handler->buildOptionsForm($form, $form_state);
+        $this->assertEquals($description_top, $form['description']['description_top']['#markup']);
+        $this->assertEquals($description_bottom, $form['description']['description_bottom']['#markup']);
+        $details = [];
+        foreach ($item as $key => $value) {
+          $details[] = new FormattableMarkup('@key: @value', ['@key' => $key, '@value' => $value]);
+        }
+        $this->assertEquals($details, $form['description']['detail_list']['#items']);
+      }
     }
 
     $views_data = $this->viewsData();
@@ -77,61 +108,6 @@ class ModuleTest extends ViewsKernelTestBase {
     ];
     $handler = $this->container->get('plugin.manager.views.filter')->getHandler($item, 'standard');
     $this->assertInstanceOf(Standard::class, $handler);
-
-    // @todo Reinstate these tests when the debug() in views_get_handler() is
-    //   restored.
-    return;
-
-    // Test non-existent tables/fields.
-    set_error_handler([$this, 'customErrorHandler']);
-    $item = [
-      'table' => 'views_test_data',
-      'field' => 'field_invalid',
-    ];
-    $this->container->get('plugin.manager.views.field')->getHandler($item);
-    $this->assertStringContainsString(new FormattableMarkup("Missing handler: @table @field @type", ['@table' => 'views_test_data', '@field' => 'field_invalid', '@type' => 'field']), $this->lastErrorMessage, 'An invalid field name throws a debug message.');
-    unset($this->lastErrorMessage);
-
-    $item = [
-      'table' => 'table_invalid',
-      'field' => 'id',
-    ];
-    $this->container->get('plugin.manager.views.filter')->getHandler($item);
-    $this->assertStringContainsString(new FormattableMarkup("Missing handler: @table @field @type", ['@table' => 'table_invalid', '@field' => 'id', '@type' => 'filter']), $this->lastErrorMessage, 'An invalid table name throws a debug message.');
-    unset($this->lastErrorMessage);
-
-    $item = [
-      'table' => 'table_invalid',
-      'field' => 'id',
-    ];
-    $this->container->get('plugin.manager.views.filter')->getHandler($item);
-    $this->assertStringContainsString(new FormattableMarkup("Missing handler: @table @field @type", ['@table' => 'table_invalid', '@field' => 'id', '@type' => 'filter']), $this->lastErrorMessage, 'An invalid table name throws a debug message.');
-    unset($this->lastErrorMessage);
-
-    restore_error_handler();
-  }
-
-  /**
-   * Defines an error handler which is used in the test.
-   *
-   * Because this is registered in set_error_handler(), it has to be public.
-   *
-   * @param int $error_level
-   *   The level of the error raised.
-   * @param string $message
-   *   The error message.
-   * @param string $filename
-   *   The filename that the error was raised in.
-   * @param int $line
-   *   The line number the error was raised at.
-   * @param array $context
-   *   An array that points to the active symbol table at the point the error
-   *   occurred.
-   *
-   * @see set_error_handler()
-   */
-  public function customErrorHandler($error_level, $message, $filename, $line, $context) {
-    $this->lastErrorMessage = $message;
   }
 
   /**
@@ -176,14 +152,14 @@ class ModuleTest extends ViewsKernelTestBase {
     foreach ($all_views as $id => $view) {
       $expected_options[$id] = $view->label();
     }
-    $this->assertIdentical($expected_options, $this->castSafeStrings(Views::getViewsAsOptions(TRUE)), 'Expected options array was returned.');
+    $this->assertIdentical($expected_options, Views::getViewsAsOptions(TRUE), 'Expected options array was returned.');
 
     // Test the default.
-    $this->assertIdentical($this->formatViewOptions($all_views), $this->castSafeStrings(Views::getViewsAsOptions()), 'Expected options array for all views was returned.');
+    $this->assertEquals($this->formatViewOptions($all_views), Views::getViewsAsOptions(), 'Expected options array for all views was returned.');
     // Test enabled views.
-    $this->assertIdentical($this->formatViewOptions($expected_enabled), $this->castSafeStrings(Views::getViewsAsOptions(FALSE, 'enabled')), 'Expected enabled options array was returned.');
+    $this->assertEquals($this->formatViewOptions($expected_enabled), Views::getViewsAsOptions(FALSE, 'enabled'), 'Expected enabled options array was returned.');
     // Test disabled views.
-    $this->assertIdentical($this->formatViewOptions($expected_disabled), $this->castSafeStrings(Views::getViewsAsOptions(FALSE, 'disabled')), 'Expected disabled options array was returned.');
+    $this->assertEquals($this->formatViewOptions($expected_disabled), Views::getViewsAsOptions(FALSE, 'disabled'), 'Expected disabled options array was returned.');
 
     // Test the sort parameter.
     $all_views_sorted = $all_views;
@@ -202,7 +178,7 @@ class ModuleTest extends ViewsKernelTestBase {
         $expected_opt_groups[$view->id()][$view->id() . ':' . $display['id']] = (string) t('@view : @display', ['@view' => $view->id(), '@display' => $display['id']]);
       }
     }
-    $this->assertIdentical($expected_opt_groups, $this->castSafeStrings(Views::getViewsAsOptions(FALSE, 'all', NULL, TRUE)), 'Expected option array for an option group returned.');
+    $this->assertEquals($expected_opt_groups, Views::getViewsAsOptions(FALSE, 'all', NULL, TRUE), 'Expected option array for an option group returned.');
   }
 
   /**
@@ -358,7 +334,7 @@ class ModuleTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Ensure that a certain handler is a instance of a certain table/field.
+   * Ensure that a certain handler is an instance of a certain table/field.
    */
   public function assertInstanceHandler($handler, $table, $field, $id) {
     $table_data = $this->container->get('views.views_data')->get($table);

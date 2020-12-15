@@ -103,13 +103,13 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     // now that we're logged in.
     $this->drupalGet('node/8', ['language' => $spanish]);
     $this->assertText('Test 12');
-    $this->assertLink('drupal');
+    $this->assertSession()->linkExists('drupal');
 
     // Make sure the content for node 8 is still in the edit form.
     $this->drupalGet('node/8/edit');
     $this->assertText('Test title');
     $this->assertText('Test body');
-    $this->assertFieldChecked('edit-field-test-1-value');
+    $this->assertSession()->checkboxChecked('edit-field-test-1-value');
     $this->assertRaw('2015-08-16');
     $this->assertRaw('test@example.com');
     $this->assertRaw('drupal.org');
@@ -135,7 +135,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     $this->assertText('usuario_test');
     $this->assertRaw('druplicon.small');
     $this->assertText('Test file field');
-    $this->assertLink('test.txt');
+    $this->assertSession()->linkExists('test.txt');
 
     // Make sure the user is translated.
     $this->drupalGet('user/3/translations');
@@ -177,10 +177,10 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
 
     // Make sure our custom visibility conditions are correct.
     $this->drupalGet('admin/structure/block/manage/testblock');
-    $this->assertNoFieldChecked('edit-visibility-language-langcodes-es');
-    $this->assertFieldChecked('edit-visibility-language-langcodes-en');
-    $this->assertNoFieldChecked('edit-visibility-node-type-bundles-book');
-    $this->assertFieldChecked('edit-visibility-node-type-bundles-test-content-type');
+    $this->assertSession()->checkboxNotChecked('edit-visibility-language-langcodes-es');
+    $this->assertSession()->checkboxChecked('edit-visibility-language-langcodes-en');
+    $this->assertSession()->checkboxNotChecked('edit-visibility-node-type-bundles-book');
+    $this->assertSession()->checkboxChecked('edit-visibility-node-type-bundles-test-content-type');
 
     // Make sure our block is still translated.
     $this->drupalGet('admin/structure/block/manage/testblock/translate/es/edit');
@@ -219,7 +219,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     $this->assertRaw('Menu test');
     // Make sure our custom menu link exists.
     $this->drupalGet('admin/structure/menu/item/1/edit');
-    $this->assertFieldChecked('edit-enabled-value');
+    $this->assertSession()->checkboxChecked('edit-enabled-value');
 
     // Make sure our comment type exists.
     $this->drupalGet('admin/structure/comment');
@@ -235,24 +235,24 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $this->assertLink('Text (formatted, long, with summary)');
-    $this->assertLink('Boolean');
-    $this->assertLink('Comments');
-    $this->assertLink('Date');
-    $this->assertLink('Email');
-    $this->assertLink('Link');
-    $this->assertLink('List (float)');
-    $this->assertLink('Telephone number');
-    $this->assertLink('Entity reference');
-    $this->assertLink('File');
-    $this->assertLink('Image');
-    $this->assertLink('Text (plain, long)');
-    $this->assertLink('List (text)');
-    $this->assertLink('Text (formatted, long)');
-    $this->assertLink('Text (plain)');
-    $this->assertLink('List (integer)');
-    $this->assertLink('Number (integer)');
-    $this->assertLink('Number (float)');
+    $this->assertSession()->linkExists('Text (formatted, long, with summary)');
+    $this->assertSession()->linkExists('Boolean');
+    $this->assertSession()->linkExists('Comments');
+    $this->assertSession()->linkExists('Date');
+    $this->assertSession()->linkExists('Email');
+    $this->assertSession()->linkExists('Link');
+    $this->assertSession()->linkExists('List (float)');
+    $this->assertSession()->linkExists('Telephone number');
+    $this->assertSession()->linkExists('Entity reference');
+    $this->assertSession()->linkExists('File');
+    $this->assertSession()->linkExists('Image');
+    $this->assertSession()->linkExists('Text (plain, long)');
+    $this->assertSession()->linkExists('List (text)');
+    $this->assertSession()->linkExists('Text (formatted, long)');
+    $this->assertSession()->linkExists('Text (plain)');
+    $this->assertSession()->linkExists('List (integer)');
+    $this->assertSession()->linkExists('Number (integer)');
+    $this->assertSession()->linkExists('Number (float)');
 
     // Make sure our form mode exists.
     $this->drupalGet('admin/structure/display-modes/form');
@@ -272,7 +272,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     $this->drupalGet('admin/config/regional/date-time');
     $this->assertText('Test date format');
     $this->drupalGet('admin/config/regional/date-time/formats/manage/test_date_format');
-    $this->assertOptionSelected('edit-langcode', 'es');
+    $this->assertTrue($this->assertSession()->optionExists('edit-langcode', 'es')->isSelected());
 
     // Make sure our custom image style exists.
     $this->drupalGet('admin/config/media/image-styles/manage/test_image_style');
@@ -293,16 +293,18 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
 
     // Make sure our language detection settings are still correct.
     $this->drupalGet('admin/config/regional/language/detection');
-    $this->assertFieldChecked('edit-language-interface-enabled-language-user-admin');
-    $this->assertFieldChecked('edit-language-interface-enabled-language-url');
-    $this->assertFieldChecked('edit-language-interface-enabled-language-session');
-    $this->assertFieldChecked('edit-language-interface-enabled-language-user');
-    $this->assertFieldChecked('edit-language-interface-enabled-language-browser');
+    $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-user-admin');
+    $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-url');
+    $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-session');
+    $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-user');
+    $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-browser');
 
     // Make sure strings are still translated.
     $this->drupalGet('admin/structure/views/view/content/translate/es/edit');
+    // cSpell:disable-next-line
     $this->assertText('Contenido');
     $this->drupalPostForm('admin/config/regional/translate', ['string' => 'Full comment'], 'Filter');
+    // cSpell:disable-next-line
     $this->assertText('Comentario completo');
 
     // Make sure our custom action is still there.
@@ -327,7 +329,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
 
     // Make sure the terms are still translated.
     $this->drupalGet('taxonomy/term/2/translations');
-    $this->assertLink('Test root term - Spanish');
+    $this->assertSession()->linkExists('Test root term - Spanish');
 
     // Make sure our contact form exists.
     $this->drupalGet('admin/structure/contact');
@@ -409,7 +411,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBaseTest {
     // Make sure our themes are still enabled.
     $expected_enabled_themes = [
       'bartik',
-      'classy',
       'seven',
       'stark',
     ];
