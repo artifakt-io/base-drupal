@@ -24,6 +24,9 @@ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && apt-get update && apt-get install --no-install-recommends -y nodejs yarn \
     && rm -rf /var/lib/apt/lists/*
 
+if [[ ! -f /opt/drupal/web/sites/default/default.settings.php ]] 
+  cp /.artifakt/default.settings.php /opt/drupal/web/sites/default/default.settings.php
+
 chown -R www-data:www-data /var/www/html/
 
 echo ">>>>>>>>>>>>>> END CUSTOM BUILD SCRIPT <<<<<<<<<<<<<<<<< "
