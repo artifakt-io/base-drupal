@@ -24,11 +24,13 @@ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && apt-get update && apt-get install --no-install-recommends -y nodejs yarn \
     && rm -rf /var/lib/apt/lists/*
 
-if [[ ! -f /opt/drupal/web/sites/default/default.settings.php ]] 
+if [[ ! -f /opt/drupal/web/sites/default/default.settings.php ]]; then
   cp /.artifakt/default.settings.php /opt/drupal/web/sites/default/default.settings.php
+fi
 
-if [[ ! -d /opt/drupal/config ]]
+if [[ ! -d /opt/drupal/config ]]; then
   ln -s /data/config /opt/drupal/config
+fi
 
 chown -R www-data:www-data /var/www/html/
 
