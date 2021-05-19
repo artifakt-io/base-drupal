@@ -13,4 +13,10 @@ export DRUPAL_DATABASE_PORT=${ARTIFAKT_MYSQL_PORT:-3306}
 # debug env vars.
 env
 
+if [[ ! -f /data/sites/default/default.settings.php ]]; then
+  mkdir -p /data/sites/default
+  cp /.artifakt/default.settings.php /data/sites/default/default.settings.php
+  ls -la /data/sites/default
+fi
+
 echo ">>>>>>>>>>>>>> END CUSTOM ENTRYPOINT SCRIPT <<<<<<<<<<<<<<<<< "
