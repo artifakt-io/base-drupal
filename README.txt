@@ -1,5 +1,4 @@
 
-
 CONTENTS OF THIS FILE
 ---------------------
 
@@ -10,19 +9,6 @@ CONTENTS OF THIS FILE
  * Developing for Drupal
  * More information
 
-ARTIFAKT DEMO APP
-------------
-
-Requirements: modern Docker distribution, >=20.x
-
-Run : docker-compose --env-file=.artifakt/.env.local up -d
-Test: open localhost:8000
-
-
-Warning about specifics:
- Some folders are ignored because they hold persistent data: modules, profiles, themes and sites.
- The compatible way to install modules and themes is by composer or the drupal user interface.
- See https://www.drupal.org/docs/extending-drupal/installing-modules
 
 ABOUT DRUPAL
 ------------
