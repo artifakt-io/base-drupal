@@ -27,6 +27,7 @@ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 if [[ ! -f /data/sites/default/default.settings.php ]]; then
   mkdir -p /data/sites/default
   cp /.artifakt/default.settings.php /data/sites/default/default.settings.php
+  ls -la /data/sites/default
 fi
 
 if [[ ! -d /opt/drupal/config ]]; then
