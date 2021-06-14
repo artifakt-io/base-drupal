@@ -2,12 +2,10 @@ version: '3'
 
 services:
   app:
+    build: .
     image: base-drupal:9.1-apache
     ports:
       - "8000:80"
-    build:
-      context: .
-      dockerfile: Dockerfile
     environment:
       - DRUPAL_HASH_SALT=fe918c992fb1bcfa01f32303c8b21f3d0a0
       - DRUPAL_DATABASE_NAME=${ARTIFAKT_MYSQL_DATABASE_NAME}
@@ -20,7 +18,7 @@ services:
       - data:/data
 
   mysql:
-    image: mysql:8
+    image: mysql/mysql-server:8
     volumes:
       - datadir:/var/lib/mysql
     environment:
