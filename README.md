@@ -40,11 +40,7 @@ docker-compose up -d --build
 
 ## Adding custom code
 
-<<<<<<< Updated upstream
-Our standard Dockerfile defines a default workdir in /var/www/html to put your code into. By default, it is copied inside the custom docker image when you build it. The following command will build a close to production docker image on your local laptop:
-=======
 Our standard Dockerfile defines a default workdir in /var/www/html to put your code into. By default, it is copied inside the custom docker image when you build it. The following command will build a close to production docker image on your local machine:
->>>>>>> Stashed changes
 
 ```
 DOCKER_BUILDKIT=1 docker build -t `basename $PWD`:latest --progress=plain .
@@ -54,7 +50,7 @@ We also have a development mode, with the included docker-compose file that will
 
 ## Persistent data
 
-To persist data between container updates, we inittialize a /data/ folder inside the docker image. You can use it for images, assets, uploads, cache, etc.
+To persist data between container updates, we initialize a /data/ folder inside the docker image. You can use it for images, assets, uploads, cache, etc.
 
 ## Building Workflow
 
@@ -62,11 +58,7 @@ What happens when you build the image with our standard Dockerfile?
 
 1. base image is pulled from Artifakt free registry
 2. local Dockerfile is built
-<<<<<<< Updated upstream
-3. if custom build args exists that are sourced from local repo
-=======
 3. if custom build args exist, they are sourced from local repo
->>>>>>> Stashed changes
 4. if a build.sh script is available, it is executed
 5. overall, during build step we add code source and install packages and internal dependencies
 6. if the special folder ‘.artifakt’ is found it is copied at the container root file system for later use.
@@ -93,7 +85,3 @@ Here is what happens when the container runs on your workstation. We apply the s
 [Build status]: https://github.com/artifakt-io/artifakt-docker-images/actions
 [Twitter badge]: https://twitter.com/intent/follow?screen_name=artifakt_com
 [Twitter handle]: https://img.shields.io/twitter/follow/artifakt_com.svg?style=social&label=Follow
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
