@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    image: base-drupal:8.9-apache
+    ports:
+      - "8000:80"
+    environment:
+      - DRUPAL_HASH_SALT=fe918c992fb1bcfa01f32303c8b21f3d0a0
+      - DRUPAL_DATABASE_NAME=${ARTIFAKT_MYSQL_DATABASE_NAME}
+      - DRUPAL_DATABASE_USERNAME=${ARTIFAKT_MYSQL_USER}
+      - DRUPAL_DATABASE_PASSWORD=${ARTIFAKT_MYSQL_PASSWORD}
+      - DRUPAL_DATABASE_HOST=${ARTIFAKT_MYSQL_HOST:-mysql}
+      - DRUPAL_DATABASE_PORT=${ARTIFAKT_MYSQL_PORT}
+    volumes:
+      - $PWD/.artifakt/default.settings.php:/opt/settings.php:ro
+      - data:/data
+
+  mysql:
+    image: mysql/mysql-server:8
+    volumes:
+      - datadir:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ARTIFAKT_MYSQL_PASSWORD}
+      - MYSQL_PORT=${ARTIFAKT_MYSQL_PORT}
+      - MYSQL_DATABASE=${ARTIFAKT_MYSQL_DATABASE_NAME}
+      - MYSQL_USER=${ARTIFAKT_MYSQL_USER}
+      - MYSQL_PASSWORD=${ARTIFAKT_MYSQL_PASSWORD}
+
+volumes:
+  data:
+  datadir:
