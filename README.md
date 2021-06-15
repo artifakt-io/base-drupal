@@ -40,7 +40,7 @@ docker-compose up -d --build
 
 ## Adding custom code
 
-Our standard Dockerfile defines a default workdir in /var/www/html to put your code into. By default, it is copied inside the custom docker image when you build it. The following command will build a close to production docker image on your local laptop:
+Our standard Dockerfile defines a default workdir in /var/www/html to put your code into. By default, it is copied inside the custom docker image when you build it. The following command will build a close to production docker image on your local machine:
 
 ```
 DOCKER_BUILDKIT=1 docker build -t `basename $PWD`:latest --progress=plain .
@@ -85,4 +85,3 @@ Here is what happens when the container runs on your workstation. We apply the s
 [Build status]: https://github.com/artifakt-io/artifakt-docker-images/actions
 [Twitter badge]: https://twitter.com/intent/follow?screen_name=artifakt_com
 [Twitter handle]: https://img.shields.io/twitter/follow/artifakt_com.svg?style=social&label=Follow
-
