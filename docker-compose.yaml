@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    image: base-drupal:9.2-apache
+    ports:
+      - "8000:80"
+    env_file: 
+      - .env
+    volumes:
+      - data:/data
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    volumes:
+      - datadir:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ARTIFAKT_MYSQL_PASSWORD}
+      - MYSQL_PORT=${ARTIFAKT_MYSQL_PORT}
+      - MYSQL_DATABASE=${ARTIFAKT_MYSQL_DATABASE_NAME}
+      - MYSQL_USER=${ARTIFAKT_MYSQL_USER}
+      - MYSQL_PASSWORD=${ARTIFAKT_MYSQL_PASSWORD}
+
+volumes:
+  data:
+  datadir:
