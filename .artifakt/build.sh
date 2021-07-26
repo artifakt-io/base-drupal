@@ -4,11 +4,6 @@ set -e
 
 echo ">>>>>>>>>>>>>> START CUSTOM BUILD SCRIPT <<<<<<<<<<<<<<<<< "
 
-echo "------------------------------------------------------------"
-echo "The following build args are available:"
-env
-echo "------------------------------------------------------------"
-
 echo 'variables_order = "EGPCS"' >> /usr/local/etc/php/conf.d/zzz-artifakt.ini
 
 composer show
