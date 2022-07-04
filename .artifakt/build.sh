@@ -14,4 +14,6 @@ if [[ ! -d /opt/drupal/config ]]; then
  chown -R www-data:www-data /data/config
 fi
 
+ls -la /data
+
 echo ">>>>>>>>>>>>>> END CUSTOM BUILD SCRIPT <<<<<<<<<<<<<<<<< "
