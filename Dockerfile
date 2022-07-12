@@ -9,21 +9,21 @@ WORKDIR /opt/drupal/
 RUN [ -f composer.lock ] && composer install --no-cache --optimize-autoloader --no-interaction --no-ansi --no-dev || true
 
 # PERSISTENT DATA FOLDERS
-RUN rm -rf /opt/drupal/web/sites && \
-  mkdir -p /data/sites && \
-  ln -snf /data/sites /opt/drupal/web/sites
+#RUN rm -rf /opt/drupal/web/sites && \
+#  mkdir -p /data/sites && \
+#  ln -snf /data/sites /opt/drupal/web/sites
 
-RUN rm -rf /opt/drupal/web/modules && \
-  mkdir -p /data/modules && \
-  ln -snf /data/modules /opt/drupal/web/modules
+#RUN rm -rf /opt/drupal/web/modules && \
+#  mkdir -p /data/modules && \
+#  ln -snf /data/modules /opt/drupal/web/modules
 
-RUN rm -rf /opt/drupal/web/profiles && \
-  mkdir -p /data/profiles && \
-  ln -snf /data/profiles /opt/drupal/web/profiles
+#RUN rm -rf /opt/drupal/web/profiles && \
+#  mkdir -p /data/profiles && \
+#  ln -snf /data/profiles /opt/drupal/web/profiles
 
-RUN rm -rf /opt/drupal/web/themes && \
-  mkdir -p /data/themes && \
-  ln -snf /data/themes /opt/drupal/web/themes
+#RUN rm -rf /opt/drupal/web/themes && \
+#  mkdir -p /data/themes && \
+#  ln -snf /data/themes /opt/drupal/web/themes
 
 # copy the artifakt folder on root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
