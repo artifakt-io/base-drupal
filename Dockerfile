@@ -9,6 +9,11 @@ WORKDIR /opt/drupal/
 RUN [ -f composer.lock ] && composer install --no-cache --optimize-autoloader --no-interaction --no-ansi --no-dev || true
 
 # PERSISTENT DATA FOLDERS
+# FIXME: Uncommenting this will prevent the container from starting on Stack v5.
+#        Root cause is that the line below will remove the /opt/drupal/web/sites at image _build_ time
+#        but the drupal:9.2-apache will try to do a symlink in /opt/drupal/web/sites/default in its 
+#        entrypoint, so at _run_ time. Unfortunately, the destination folder is gone, so symlink failed
+#        and drupal don't find its configurations and crash
 #RUN rm -rf /opt/drupal/web/sites && \
 #  mkdir -p /data/sites && \
 #  ln -snf /data/sites /opt/drupal/web/sites
