@@ -1,4 +1,4 @@
-FROM registry.artifakt.io/drupal:9.2-apache
+FROM registry.artifakt.io/drupal:9.4-apache
 
 ARG CODE_ROOT=.
 
